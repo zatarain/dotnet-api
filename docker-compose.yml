@@ -1,0 +1,50 @@
+version: "3.4"
+
+services:
+  hello-world:
+    container_name: api-service
+    image: ${DOCKER_REGISTRY-}hello-world
+    build:
+      context: .
+      dockerfile: HelloWorld/Dockerfile
+    ports:
+      - "7080:80"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://0.0.0.0:80"
+      Postgres__Database: hello-world
+      Postgres__Hostname: ${POSTGRES_HOST}
+      Postgres__Username: ${POSTGRES_USERNAME}
+      Postgres__Password: ${POSTGRES_PASSWORD}
+
+  database:
+    container_name: database
+    image: postgres:14.9
+    restart: always
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - data:/var/lib/postgresql/data/pgdata
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+volumes:
+  data:
+    name: consumer-database
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: data
