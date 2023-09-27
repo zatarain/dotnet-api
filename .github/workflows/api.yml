@@ -62,9 +62,9 @@ jobs:
       - name: Installing tools and dependencies
         run: |
           dotnet tool restore
-          dotnet restore --locked-mode white-pages.sln
+          dotnet restore --locked-mode hello-world.sln
       - name: Compiling projects
-        run: dotnet build --configuration Release --no-restore white-pages.sln
+        run: dotnet build --configuration Release --no-restore hello-world.sln
       - name: Running database migrations
         run: dotnet ef database update --startup-project HelloWorld --project HelloWorld
       - name: Running unit tests
@@ -74,7 +74,7 @@ jobs:
             --no-restore --no-build \
             --verbosity normal \
             --collect:"XPlat Code Coverage" \
-            white-pages.sln
+            hello-world.sln
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
